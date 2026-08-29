@@ -1,0 +1,67 @@
+# Dependencies and builds
+node_modules/
+.npm-cache/
+archive/
+dist/
+coverage/
+.nyc_output/
+*.tsbuildinfo
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+!.env.e2e.example
+
+# Local databases
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# Runtime artifacts
+storage/*
+!storage/.gitkeep
+!storage/exports/
+!storage/diagnostics/
+!storage/exports/.gitkeep
+!storage/diagnostics/.gitkeep
+logs/
+exports/
+diagnostic-results/
+/screenshots/
+/qa-screenshots/
+debug-artifacts/
+playwright-report/
+test-results/
+blob-report/
+playwright/.cache/
+playwright/.auth/
+.auth/
+*.trace.zip
+*.webm
+*.evtx
+*.etl
+*.dmp
+*.exe
+*.pdb
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.log
+*.bak
+*.backup
+*.old
+*.session
+*.session.json
+.DS_Store
+Thumbs.db
+
+# Editors
+.idea/
+.vscode/
+*.swp

@@ -1,0 +1,5 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {"noEmit": true, "types": ["node"], "exactOptionalPropertyTypes": false},
+  "include": ["apps/api/src/**/*.d.ts", "scripts/bootstrap-local-operational.ts", "scripts/qa-diagnostics-real.ts", "scripts/qa-containment.ts", "scripts/qa-bootstrap.ts", "scripts/qa-phase6-performance.ts"]
+}

@@ -1,0 +1,39 @@
+import { useEffect, useRef } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { ChevronLeft, ChevronRight, Plus, Search, SlidersHorizontal, X } from 'lucide-react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { EmptyState, ErrorState, ListSkeleton } from '../components/Feedback';
+import { Avatar, PriorityIndicator, SlaIndicator, StatusChip, TicketCode } from '../components/TicketPrimitives';
+import { getCategories, getDepartments, getTechnicians, getTickets, ticketPriorities, ticketStatuses } from '../lib/api';
+import { formatRelative, translateUi } from '../i18n/I18nProvider';
+
+export function TicketsPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const searchRef = useRef<HTMLInputElement>(null);
+  const query = Object.fromEntries(searchParams);
+  const tickets = useQuery({ queryKey: ['tickets', query], queryFn: () => getTickets({ ...query, page: query.page ?? 1, pageSize: 20, sort: query.sort ?? 'updatedAt', order: query.order ?? 'desc' }) });
+  const categories = useQuery({ queryKey: ['categories', 'filters'], queryFn: () => getCategories({ pageSize: 100 }) });
+  const departments = useQuery({ queryKey: ['departments', 'filters'], queryFn: () => getDepartments({ pageSize: 100 }) });
+  const technicians = useQuery({ queryKey: ['technicians'], queryFn: getTechnicians });
+  useEffect(() => { if (searchParams.get('focus') === 'search') searchRef.current?.focus(); }, [searchParams]);
+
+  function setFilter(key: string, value: string) { const next = new URLSearchParams(searchParams); if (value) next.set(key, value); else next.delete(key); next.delete('page'); next.delete('focus'); setSearchParams(next); }
+  const activeFilters = [...searchParams.entries()].filter(([key, value]) => value && !['page', 'sort', 'order', 'focus'].includes(key));
+  const page = Number(query.page ?? 1);
+  return <div className="page-stack page-stack--dense">
+    <header className="page-header"><div><span className="eyebrow eyebrow--accent">Service desk</span><h1>Ticket queue</h1><p>Search, triage, and move work forward without losing operational context.</p></div><Link className="button button--primary" to="/tickets/new"><Plus size={16} />New ticket</Link></header>
+    <section className="queue-controls" aria-label="Ticket filters">
+      <label className="search-field"><Search size={16} /><input ref={searchRef} type="search" placeholder="Search ticket code, summary, requester…" value={query.search ?? ''} onChange={(event) => setFilter('search', event.target.value)} aria-label="Search tickets" /></label>
+      <div className="filter-row"><FilterSelect label="Status" value={query.status} onChange={(value) => setFilter('status', value)} options={ticketStatuses.map((value) => ({ value, label: statusLabel(value) }))} /><FilterSelect label="Priority" value={query.priority} onChange={(value) => setFilter('priority', value)} options={ticketPriorities.map((value) => ({ value, label: translateUi(value) }))} /><FilterSelect label="Category" value={query.categoryId} onChange={(value) => setFilter('categoryId', value)} options={(categories.data?.data ?? []).map((item) => ({ value: item.id, label: item.name }))} /><FilterSelect label="Assignee" value={query.assigneeId} onChange={(value) => setFilter('assigneeId', value)} options={(technicians.data?.data ?? []).map((item) => ({ value: item.id, label: item.user?.displayName ?? item.username }))} /><FilterSelect label="Department" value={query.departmentId} onChange={(value) => setFilter('departmentId', value)} options={(departments.data?.data ?? []).map((item) => ({ value: item.id, label: item.name }))} /><FilterSelect label="SLA" value={query.slaState} onChange={(value) => setFilter('slaState', value)} options={[{ value: 'healthy', label: translateUi('Healthy') }, { value: 'at-risk', label: translateUi('At risk') }, { value: 'breached', label: translateUi('Breached') }, { value: 'paused', label: translateUi('Paused') }]} /></div>
+      {activeFilters.length ? <div className="active-filters"><span><SlidersHorizontal size={13} />{activeFilters.length} active</span>{activeFilters.map(([key, value]) => <button type="button" key={key} onClick={() => setFilter(key, '')}>{key}: {value}<X size={12} /></button>)}<button className="clear-filter" type="button" onClick={() => setSearchParams({})}>Clear all</button></div> : null}
+    </section>
+    <section className="queue-panel" aria-label="Ticket results">
+      <header className="queue-panel__header"><div><strong>{tickets.data?.pagination.total ?? '—'} tickets</strong><span>Sorted by last updated</span></div><label>Sort<select value={`${query.sort ?? 'updatedAt'}:${query.order ?? 'desc'}`} onChange={(event) => { const [sort, order] = event.target.value.split(':'); const next = new URLSearchParams(searchParams); if (sort) next.set('sort', sort); if (order) next.set('order', order); setSearchParams(next); }}><option value="updatedAt:desc">Recently updated</option><option value="createdAt:desc">Newest first</option><option value="priority:desc">Priority</option><option value="ticketNumber:asc">Ticket code</option></select></label></header>
+      {tickets.isPending ? <ListSkeleton rows={8} /> : tickets.isError ? <ErrorState onRetry={() => void tickets.refetch()} /> : tickets.data?.data.length ? <div className="ticket-table-wrap"><table className="ticket-table"><thead><tr><th>Ticket</th><th>Summary</th><th>Requester</th><th>Priority</th><th>Status</th><th>Assignee</th><th>SLA</th><th>Updated</th></tr></thead><tbody>{tickets.data.data.map((ticket) => <tr key={ticket.id}><td><Link to={`/tickets/${ticket.id}`}><TicketCode ticket={ticket} /></Link></td><td><Link className="ticket-summary" to={`/tickets/${ticket.id}`}><strong>{ticket.title}</strong><span>{ticket.category.name}</span></Link></td><td>{ticket.requester.displayName}</td><td><PriorityIndicator priority={ticket.priority} /></td><td><StatusChip status={ticket.status} /></td><td>{ticket.assignee ? <span className="person-cell"><Avatar name={ticket.assignee.user?.displayName ?? ticket.assignee.username} small />{ticket.assignee.user?.displayName ?? ticket.assignee.username}</span> : <span className="muted">Unassigned</span>}</td><td><SlaIndicator ticket={ticket} compact /></td><td><time dateTime={ticket.updatedAt}>{formatRelative(ticket.updatedAt)}</time></td></tr>)}</tbody></table></div> : <EmptyState title="No tickets match these filters." description="Adjust or clear filters to return to the full service desk queue." action={<button className="button button--secondary" type="button" onClick={() => setSearchParams({})}>Clear filters</button>} />}
+      {tickets.data && tickets.data.pagination.totalPages > 1 ? <footer className="pagination"><span>Page {tickets.data.pagination.page} of {tickets.data.pagination.totalPages}</span><div><button type="button" disabled={page <= 1} onClick={() => setFilter('page', String(page - 1))} aria-label="Previous page"><ChevronLeft size={16} /></button><button type="button" disabled={page >= tickets.data.pagination.totalPages} onClick={() => setFilter('page', String(page + 1))} aria-label="Next page"><ChevronRight size={16} /></button></div></footer> : null}
+    </section>
+  </div>;
+}
+
+function FilterSelect({ label, value, options, onChange }: { label: string; value?: string; options: { value: string; label: string }[]; onChange: (value: string) => void }) { return <label className={value ? 'filter-select filter-select--active' : 'filter-select'}><span className="sr-only">{label}</span><select value={value ?? ''} onChange={(event) => onChange(event.target.value)}><option value="">{label}</option>{options.map((option) => <option value={option.value} key={option.value}>{option.label}</option>)}</select></label>; }
+function statusLabel(status: string) { return translateUi(status.replace(/([a-z])([A-Z])/g, '$1 $2')); }

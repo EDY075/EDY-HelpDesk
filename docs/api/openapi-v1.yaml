@@ -1,0 +1,52 @@
+openapi: 3.1.0
+info:
+  title: EDY HelpDesk Internal API
+  version: 1.0.0
+  description: Local-first, cookie-session API. Examples are synthetic and contain no credentials.
+servers:
+  - url: /api/v1
+paths:
+  /health:
+    get: { summary: Process liveness, responses: { '200': { description: Healthy } } }
+  /ready:
+    get: { summary: Configuration and database readiness, responses: { '200': { description: Ready }, '503': { description: Database unavailable } } }
+  /auth/login:
+    post: { summary: Create a rotated server-side session, responses: { '200': { description: Authenticated }, '401': { description: Invalid credentials }, '429': { description: Rate limited } } }
+  /auth/logout:
+    post: { summary: Revoke the current session, security: [{ cookieSession: [] }], responses: { '204': { description: Revoked } } }
+  /auth/me:
+    get: { summary: Read current session, security: [{ cookieSession: [] }], responses: { '200': { description: Session }, '401': { description: Unauthenticated } } }
+  /tickets:
+    get: { summary: List scoped tickets, security: [{ cookieSession: [] }], responses: { '200': { description: Ticket page } } }
+    post: { summary: Create ticket, security: [{ cookieSession: [], csrf: [] }], responses: { '201': { description: Ticket created }, '403': { description: Forbidden } } }
+  /tickets/{id}:
+    parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+    get: { summary: Ticket workspace, security: [{ cookieSession: [] }], responses: { '200': { description: Ticket } } }
+    patch: { summary: Optimistic ticket update, security: [{ cookieSession: [], csrf: [] }], responses: { '200': { description: Updated }, '409': { description: Version conflict } } }
+  /assets:
+    get: { summary: List assets, security: [{ cookieSession: [] }], responses: { '200': { description: Asset page } } }
+    post: { summary: Register asset, security: [{ cookieSession: [], csrf: [] }], responses: { '201': { description: Asset created } } }
+  /assets/{id}/diagnostics:
+    parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+    get: { summary: Diagnostic history, security: [{ cookieSession: [] }], responses: { '200': { description: Sanitized history } } }
+    post: { summary: Request one allowlisted local diagnostic, security: [{ cookieSession: [], csrf: [] }], responses: { '202': { description: Queued }, '403': { description: Demo or RBAC denied } } }
+  /knowledge:
+    get: { summary: Search knowledge, security: [{ cookieSession: [] }], responses: { '200': { description: Article page } } }
+    post: { summary: Create draft, security: [{ cookieSession: [], csrf: [] }], responses: { '201': { description: Draft } } }
+  /security/cases:
+    get: { summary: Security queue, security: [{ cookieSession: [] }], responses: { '200': { description: Case page } } }
+  /dashboard:
+    get: { summary: Real persisted dashboard metrics, security: [{ cookieSession: [] }], responses: { '200': { description: Dashboard } } }
+  /reports:
+    get: { summary: Scoped report history, security: [{ cookieSession: [] }], responses: { '200': { description: Jobs } } }
+    post: { summary: Queue governed export, security: [{ cookieSession: [], csrf: [] }], responses: { '202': { description: Queued }, '429': { description: Rate limited } } }
+  /integrations:
+    get: { summary: Truthful integration and Outbox status, security: [{ cookieSession: [] }], responses: { '200': { description: Status } } }
+  /integrations/analytics/exports:
+    post: { summary: Create minimized local analytics export, security: [{ cookieSession: [], csrf: [] }], responses: { '201': { description: Created }, '403': { description: Admin required }, '429': { description: Rate limited } } }
+  /settings:
+    get: { summary: Effective non-secret settings, security: [{ cookieSession: [] }], responses: { '200': { description: Settings } } }
+components:
+  securitySchemes:
+    cookieSession: { type: apiKey, in: cookie, name: edy_session }
+    csrf: { type: apiKey, in: header, name: x-csrf-token }

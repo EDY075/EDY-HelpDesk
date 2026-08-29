@@ -1,0 +1,32 @@
+{
+  "name": "@edy/diagnostics-worker",
+  "version": "1.0.0",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "scripts": {
+    "prebuild": "npm run build --workspace @edy/config",
+    "build": "tsup src/index.ts --format esm --platform node --target node22 --sourcemap --out-dir dist --external pg --external @prisma/adapter-pg",
+    "dev": "node --env-file=../../.env --import tsx --watch src/index.ts",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "pretest": "npm run build --workspace @edy/config",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "start": "node --env-file=../../.env dist/index.js"
+  },
+  "dependencies": {
+    "@edy/config": "*",
+    "@edy/contracts": "*",
+    "@prisma/client": "^7.10.0",
+    "@prisma/adapter-better-sqlite3": "7.10.0",
+    "pino": "^9.7.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3",
+    "tsup": "8.5.0",
+    "vitest": "4.1.11"
+  }
+}
