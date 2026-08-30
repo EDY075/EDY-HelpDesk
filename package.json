@@ -1,6 +1,6 @@
 {
   "name": "edy-helpdesk",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "license": "MIT",
   "private": true,
   "type": "module",
@@ -42,6 +42,10 @@
     "restore:validate": "node --import tsx scripts/restore-validate.ts",
     "e2e:prepare": "node --env-file=.env --import tsx scripts/e2e-prepare.ts",
     "e2e": "npm run e2e:prepare && node --env-file=.env node_modules/@playwright/test/cli.js test",
+    "demo:setup": "node scripts/demo/setup-demo.mjs",
+    "demo:start": "node scripts/demo/start-demo.mjs",
+    "demo:stop": "node scripts/demo/stop-demo.mjs",
+    "test:demo-launchers": "node --test scripts/demo/demo-policy.test.mjs",
     "check": "npm run lint && npm run typecheck && npm run test && npm run build",
     "audit:dependencies": "npm audit --audit-level=high",
     "scan:secrets": "node scripts/secret-scan.mjs",

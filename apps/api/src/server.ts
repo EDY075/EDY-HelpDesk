@@ -9,7 +9,7 @@ import { createPrismaClient } from "./platform/prisma.js";
 import { closeHttpServer } from "./platform/graceful-shutdown.js";
 import {ensureDeploymentMode,installDiagnosticCatalog} from './modules/diagnostics/catalog.js';
 
-const APP_VERSION = "1.0.0";
+const APP_VERSION = "1.0.1";
 
 async function main(): Promise<void> {
   const config = loadConfig();

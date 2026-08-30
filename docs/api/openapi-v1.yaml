@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: EDY HelpDesk Internal API
-  version: 1.0.0
+  version: 1.0.1
   description: Local-first, cookie-session API. Examples are synthetic and contain no credentials.
 servers:
   - url: /api/v1

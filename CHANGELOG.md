@@ -2,6 +2,16 @@
 
 Release notes for EDY HelpDesk. This file summarizes product increments; it is not a commit log.
 
+## 1.0.1 — Presentation & Demo Experience
+
+- Redesigned the GitHub landing README for faster product evaluation.
+- Added professional bilingual README navigation and a branded EDY HelpDesk cover.
+- Simplified Quick Start and improved the presentation of the approved synthetic screenshots.
+- Added secure Windows Easy Demo launchers for setup, supervised start and scoped stop.
+- Added locally generated demo credentials with no public or hardcoded password.
+- Added a repository Social Preview asset and clearer technical-documentation navigation.
+- Cleaned up presentation documentation without changing core application behavior.
+
 ## 1.0.0 — Final local release
 
 - Completed the public-repository hygiene, privacy, clean-install, localization, theme, accessibility and visual release audit.
@@ -60,4 +70,4 @@ Release notes for EDY HelpDesk. This file summarizes product increments; it is n
 
 ## License
 
-No license has been selected. License approval is a release/publication prerequisite; no arbitrary license is implied by this repository.
+EDY HelpDesk is distributed under the [MIT License](LICENSE).
