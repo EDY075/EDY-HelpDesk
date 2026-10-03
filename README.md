@@ -17,6 +17,10 @@ Service Desk local-first para gestão de chamados, SLA, ativos e suporte a endpo
   <img alt="Languages pt-BR and English" src="https://img.shields.io/badge/languages-pt--BR%20%7C%20en-4f4b45">
 </p>
 
+## Apresentação em vídeo
+
+https://github.com/user-attachments/assets/4bd3c517-b8b3-46b7-af49-16e617e8a987
+
 ## Highlights
 
 - 🎫 **Service Desk & Ticket Workflow** — lifecycle governado, assignment, timeline e optimistic locking.
