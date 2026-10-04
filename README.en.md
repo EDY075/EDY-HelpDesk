@@ -17,6 +17,10 @@ A local-first Service Desk for ticket, SLA, asset, and Windows endpoint support.
   <img alt="Languages pt-BR and English" src="https://img.shields.io/badge/languages-pt--BR%20%7C%20en-4f4b45">
 </p>
 
+## Video presentation
+
+https://github.com/user-attachments/assets/9ccf35d5-9703-4008-8dfe-d918862362b8
+
 ## Highlights
 
 - 🎫 **Service Desk & Ticket Workflow** — governed lifecycle, assignment, timeline, and optimistic locking.

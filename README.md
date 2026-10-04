@@ -19,7 +19,7 @@ Service Desk local-first para gestão de chamados, SLA, ativos e suporte a endpo
 
 ## Apresentação em vídeo
 
-https://github.com/user-attachments/assets/4bd3c517-b8b3-46b7-af49-16e617e8a987
+https://github.com/user-attachments/assets/9ccf35d5-9703-4008-8dfe-d918862362b8
 
 ## Highlights
 
